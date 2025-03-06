@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Target
+  - Pickable
   layers:
   - Default
   - TransparentFX
@@ -14,8 +15,8 @@ TagManager:
   - UI
   - Tabs
   - Bullet
-  - 
-  - 
+  - MouseCollider
+  - PickAble
   - 
   - 
   - 

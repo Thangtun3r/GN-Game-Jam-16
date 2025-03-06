@@ -4,14 +4,13 @@ public class Bullet : MonoBehaviour
 {
     private Vector2 moveDirection;
     private float moveSpeed;
-    private ObjectPool pool;
     private Rigidbody2D rb;
 
-    public void Initialize(Vector2 direction, float speed, ObjectPool objectPool)
+    // Initialize no longer needs an object pool reference.
+    public void Initialize(Vector2 direction, float speed)
     {
         moveDirection = direction;
         moveSpeed = speed;
-        pool = objectPool;
         rb = GetComponent<Rigidbody2D>();
 
         if (rb == null)
@@ -20,12 +19,13 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity = moveDirection * moveSpeed; // Ensures a straight path
+        // Set the bullet's velocity.
+        rb.linearVelocity = moveDirection * moveSpeed;
     }
 
     private void Update()
     {
-        // Ensures the bullet always moves in the exact same direction
+        // If you want to use physics only, you can remove this manual position update.
         transform.position += (Vector3)moveDirection * moveSpeed * Time.deltaTime;
     }
 
@@ -36,13 +36,14 @@ public class Bullet : MonoBehaviour
 
     private void OnBecameInvisible()
     {
-        ReturnToPool(); // Return bullet to the pool when off-screen
+        ReturnToPool(); // Return bullet to the pool when it goes off-screen.
     }
 
     private void ReturnToPool()
     {
-        rb.linearVelocity = Vector2.zero; // Reset velocity before returning
-        gameObject.SetActive(false);
-        pool.ReturnObject(gameObject);
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+        // Return this bullet to the BulletPool.
+        BulletPool.Instance.ReturnToPool(gameObject);
     }
 }

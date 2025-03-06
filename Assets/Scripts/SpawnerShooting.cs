@@ -2,73 +2,58 @@ using UnityEngine;
 
 public class SpawnerShooter : MonoBehaviour
 {
-    public enum ShootDirection { FourWay, XPattern }
-    public ShootDirection shootingMode = ShootDirection.FourWay;
-
-    private ObjectPool bulletPool;
-    public float bulletSpeed = 5f; // Adjustable bullet speed
+    [Header("Bullet Settings")]
+    [Tooltip("The bullet prefab that should have the Bullet script attached.")]
+    public GameObject bulletPrefab;
+    public BulletDirections bulletDirections = BulletDirections.Up;
+    public float bulletSpeed = 5f;
 
     private void Start()
     {
-        bulletPool = FindObjectOfType<ObjectPool>();
 
-        if (bulletPool == null)
-        {
-            Debug.LogError("No ObjectPool found in the scene! Make sure one exists.");
-            return;
-        }
 
+        // Fire bullets in all chosen directions.
         Shoot();
     }
 
     private void Shoot()
     {
-        switch (shootingMode)
-        {
-            case ShootDirection.FourWay:
-                ShootFourWay();
-                break;
-            case ShootDirection.XPattern:
-                ShootXPattern();
-                break;
-        }
-    }
-
-    private void ShootFourWay()
-    {
-        Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-
-        foreach (Vector2 dir in directions)
-        {
-            SpawnBullet(dir);
-        }
-    }
-
-    private void ShootXPattern()
-    {
-        Vector2[] directions = {
-            new Vector2(1, 1).normalized,
-            new Vector2(-1, 1).normalized,
-            new Vector2(1, -1).normalized,
-            new Vector2(-1, -1).normalized
-        };
-
-        foreach (Vector2 dir in directions)
-        {
-            SpawnBullet(dir);
-        }
+        if ((bulletDirections & BulletDirections.Up) != 0)
+            SpawnBullet(Vector2.up);
+        if ((bulletDirections & BulletDirections.Down) != 0)
+            SpawnBullet(Vector2.down);
+        if ((bulletDirections & BulletDirections.Left) != 0)
+            SpawnBullet(Vector2.left);
+        if ((bulletDirections & BulletDirections.Right) != 0)
+            SpawnBullet(Vector2.right);
+        if ((bulletDirections & BulletDirections.DiagonalUpLeft) != 0)
+            SpawnBullet(new Vector2(-1, 1).normalized);
+        if ((bulletDirections & BulletDirections.DiagonalUpRight) != 0)
+            SpawnBullet(new Vector2(1, 1).normalized);
+        if ((bulletDirections & BulletDirections.DiagonalDownLeft) != 0)
+            SpawnBullet(new Vector2(-1, -1).normalized);
+        if ((bulletDirections & BulletDirections.DiagonalDownRight) != 0)
+            SpawnBullet(new Vector2(1, -1).normalized);
     }
 
     private void SpawnBullet(Vector2 direction)
     {
-        if (bulletPool == null) return;
+        if (bulletPrefab == null)
+        {
+            Debug.LogWarning("Bullet prefab not assigned!");
+            return;
+        }
 
-        GameObject bullet = bulletPool.GetObject(transform.position, Quaternion.identity);
+        // Get the bullet instance from the universal pool.
+        GameObject bullet = BulletPool.Instance.GetPooledObject(bulletPrefab);
+        bullet.transform.position = transform.position;
+        bullet.transform.rotation = Quaternion.identity;
+        bullet.SetActive(true);
+
         Bullet bulletScript = bullet.GetComponent<Bullet>();
-
         if (bulletScript != null)
         {
-            bulletScript.Initialize(direction, bulletSpeed, bulletPool); // Set direction & speed
+            bulletScript.Initialize(direction, bulletSpeed);
         }
         else
         {
