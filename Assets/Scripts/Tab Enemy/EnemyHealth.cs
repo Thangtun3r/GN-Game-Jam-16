@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
@@ -6,12 +7,19 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private int currentHealth;
     private TabDeathParticle deathParticle;
 
+    // Static event to notify when an enemy dies.
+    public static event Action OnEnemyDeath;
+
+    private void OnEnable()
+    {
+        currentHealth = maxHealth;
+    }
+
     private void Start()
     {
         currentHealth = maxHealth;
         deathParticle = GetComponent<TabDeathParticle>();
         
-        // Check if component exists
         if (deathParticle == null)
         {
             Debug.LogWarning("TabDeathParticle component missing on " + gameObject.name);
@@ -30,15 +38,15 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        // Spawn particle effect
         Vector3 deathPosition = transform.position;
-        
         if (deathParticle != null)
         {
             deathParticle.SpawnDeathParticle();
         }
         
-        // Return enemy to the pool
+        // Notify subscribers that this enemy has died.
+        OnEnemyDeath?.Invoke();
+
         TabPool pool = FindObjectOfType<TabPool>();
         if (pool != null)
         {

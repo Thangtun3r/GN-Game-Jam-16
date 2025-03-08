@@ -33,7 +33,6 @@ public class HitEffect : MonoBehaviour
         // Check if collided with damage dealer
         if (collision.gameObject.GetComponent<CursorDamageDealer>() != null)
         {
-            Debug.Log("Shake from cursor collision");
 
             // Start the shake effect
             if (!isShaking)
