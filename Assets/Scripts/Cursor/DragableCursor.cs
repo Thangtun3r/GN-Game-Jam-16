@@ -79,7 +79,7 @@ public class DragableCursor : MonoBehaviour
         Vector2 throwVelocity = (mouseWorldPos - lastMouseWorldPos) / Time.deltaTime;
         Vector2 impulse = throwVelocity * throwForceMultiplier * throwSpeed;
 
-        // Clamp the impulse magnitude between the minimum and maximum force limits
+        // Clamp the impulse magnitude
         float clampedMagnitude = Mathf.Clamp(impulse.magnitude, minThrowForce, maxThrowForce);
         if (impulse != Vector2.zero)
         {
@@ -88,12 +88,27 @@ public class DragableCursor : MonoBehaviour
 
         // Apply the clamped impulse force
         selectedRb.AddForce(impulse, ForceMode2D.Impulse);
-        
+
         // Notify the dragable that dragging has ended
         selectedDragable.OnEndDrag(impulse);
 
         // Clear references
         selectedDragable = null;
         selectedRb = null;
+    }
+
+    /// <summary>
+    /// Forcefully release the object if we are in the middle of a drag,
+    /// typically called when drag mode is disabled by Tab or timeout.
+    /// Pass zero (Vector2.zero) if you want the object to simply drop.
+    /// </summary>
+    public void ForceReleaseIfDragging()
+    {
+        if (selectedDragable != null)
+        {
+            // Optionally compute a velocity or just pass zero.
+            // For example, to "drop" it with no throw:
+            ReleaseObject(lastMouseWorldPos); 
+        }
     }
 }

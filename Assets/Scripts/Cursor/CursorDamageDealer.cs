@@ -14,4 +14,14 @@ public class CursorDamageDealer : MonoBehaviour
             damageable.TakeDamage(damageAmount);
         }
     }
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        // Check if the triggered object has a component that implements IDamageable
+        IDamageable damageable = collider.gameObject.GetComponent<IDamageable>();
+
+        if (damageable != null)
+        {
+            damageable.TakeDamage(damageAmount);
+        }
+    }
 }

@@ -18,6 +18,17 @@ public class CursorBeingDamage : MonoBehaviour, ICursorDamageable
             TakeDamage();
         }
     }
+    
+    // Called when another trigger collider overlaps with this collider.
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag(damageDealerTag))
+        {
+            Debug.Log("Trigger damage taken!");
+            TakeDamage();
+            TakeDamage();
+        }
+    }
 
     // Implements the ICursorDamageable interface.
     public void TakeDamage()

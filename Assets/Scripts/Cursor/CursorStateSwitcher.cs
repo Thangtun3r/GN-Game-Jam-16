@@ -23,8 +23,8 @@ public class CursorStateSwitcher : MonoBehaviour
     [SerializeField] private float dragModeDuration = 5f; // How long dragable mode lasts
     [SerializeField] private float dragModeCooldown = 10f; // Cooldown after using dragable mode
     [SerializeField] private TextMeshProUGUI cooldownText; // Text display
-    [SerializeField] private Image cooldownRadial; // Circular fill image
-
+    [SerializeField] private Image cooldownRadial;         // Circular fill image
+ 
     // References to specific components
     private SpriteRenderer colliderCursorSprite;
     private Collider2D colliderCursorCollider;
@@ -39,7 +39,6 @@ public class CursorStateSwitcher : MonoBehaviour
 
     private void Start()
     {
-        Cursor.visible = false;
         // Get component references
         if (colliderCursor != null)
         {
@@ -62,23 +61,23 @@ public class CursorStateSwitcher : MonoBehaviour
 
     private void Update()
     {
+        Cursor.visible = false;
+
         // Toggle cursor state on Tab key press if not in cooldown
         if (Input.GetKeyDown(KeyCode.Tab) && !isInCooldown)
         {
             ToggleCursorState();
         }
 
-        // Handle dragable mode duration
+        // If in dragable mode, count down
         if (!isColliderMode)
         {
             remainingDragDuration -= Time.deltaTime;
 
-            // Update UI - fill FROM EMPTY to FULL as time passes
+            // Update UI - fill from 0 to 1 as time passes in drag mode
             if (cooldownRadial != null)
             {
                 cooldownRadial.gameObject.SetActive(true);
-                cooldownRadial.color = Color.black;
-                // Calculate fill amount to go from 0 to 1
                 cooldownRadial.fillAmount = 1 - (remainingDragDuration / dragModeDuration);
             }
 
@@ -91,6 +90,12 @@ public class CursorStateSwitcher : MonoBehaviour
             // Switch back when duration ends
             if (remainingDragDuration <= 0)
             {
+                // Force release any dragged object before leaving drag mode
+                if (dragableCursor != null)
+                {
+                    dragableCursor.ForceReleaseIfDragging();
+                }
+
                 // Switch to collider mode
                 isColliderMode = true;
                 SetCursorState(true);
@@ -105,11 +110,10 @@ public class CursorStateSwitcher : MonoBehaviour
         {
             remainingCooldown -= Time.deltaTime;
 
-            // Update UI - red color and depleting FROM FULL to EMPTY
+            // Update UI - depleting from 1 to 0 during cooldown
             if (cooldownRadial != null)
             {
                 cooldownRadial.gameObject.SetActive(true);
-                cooldownRadial.color = Color.red; // Red for cooldown
                 cooldownRadial.fillAmount = remainingCooldown / dragModeCooldown;
             }
 
@@ -148,18 +152,23 @@ public class CursorStateSwitcher : MonoBehaviour
             if (cooldownRadial != null)
             {
                 cooldownRadial.fillAmount = 0f;
-                cooldownRadial.color = Color.black;
             }
 
             SetCursorState(false);
         }
-        // Always allow switching back to collider mode
+        // Switching back to collider mode
         else if (!isColliderMode)
         {
+            // Force release any dragged object before leaving drag mode
+            if (dragableCursor != null)
+            {
+                dragableCursor.ForceReleaseIfDragging();
+            }
+
             isColliderMode = true;
             SetCursorState(true);
 
-            // Start cooldown with full radial
+            // Start cooldown
             isInCooldown = true;
             remainingCooldown = dragModeCooldown;
 
@@ -167,7 +176,6 @@ public class CursorStateSwitcher : MonoBehaviour
             if (cooldownRadial != null)
             {
                 cooldownRadial.fillAmount = 1f;
-                cooldownRadial.color = Color.red;
             }
         }
     }
@@ -188,7 +196,7 @@ public class CursorStateSwitcher : MonoBehaviour
                     useCollider ? colliderModeSprite : dragModeSprite));
             }
 
-            // We still enable/disable the collider based on mode
+            // Enable/disable the collider based on mode
             if (colliderCursorCollider != null)
                 colliderCursorCollider.enabled = useCollider;
         }
@@ -251,11 +259,17 @@ public class CursorStateSwitcher : MonoBehaviour
         fadeCoroutine = null;
     }
 
-    // Public methods for external state control
+    // Optional external methods to enable specific mode from other scripts:
     public void EnableColliderMode()
     {
         if (!isInCooldown || !isColliderMode)
         {
+            // Force release
+            if (dragableCursor != null)
+            {
+                dragableCursor.ForceReleaseIfDragging();
+            }
+
             isColliderMode = true;
             SetCursorState(true);
 
@@ -263,13 +277,8 @@ public class CursorStateSwitcher : MonoBehaviour
             {
                 isInCooldown = true;
                 remainingCooldown = dragModeCooldown;
-
-                // Initialize cooldown radial to full
                 if (cooldownRadial != null)
-                {
                     cooldownRadial.fillAmount = 1f;
-                    cooldownRadial.color = Color.red;
-                }
             }
         }
     }
@@ -281,11 +290,9 @@ public class CursorStateSwitcher : MonoBehaviour
             isColliderMode = false;
             remainingDragDuration = dragModeDuration;
 
-            // Initialize drag mode radial to empty
             if (cooldownRadial != null)
             {
                 cooldownRadial.fillAmount = 0f;
-                cooldownRadial.color = Color.black;
             }
 
             SetCursorState(false);

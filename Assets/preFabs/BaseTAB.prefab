@@ -255,6 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTag: Target
+  stoppingDistance: 0.5
   speed: 2
   visualContainer: {fileID: 13099221862983832}
   wiggleAmount: 2.3
@@ -274,7 +275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5ef8d18aa091746b5028acaf627f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 200
+  maxHealth: 300
 --- !u!50 &4102310706605584288
 Rigidbody2D:
   serializedVersion: 4
@@ -333,14 +334,14 @@ MonoBehaviour:
   drawImpactRay: 1
   impactColor: {r: 1, g: 0, b: 0, a: 1}
   debugLineDuration: 0.5
-  impactThreshold: 30
+  impactThreshold: 2
   impactLayer:
     serializedVersion: 2
     m_Bits: 128
   mainCamera: {fileID: 0}
   shakeDuration: 0.2
   shakeIntensity: 0.1
-  slowMotionDuration: 0.5
+  slowMotionDuration: 0.6
   slowMotionTimeScale: 0.1
   objectToToggle: {fileID: 0}
-  damageAmount: 200
+  damageAmount: 11111111
