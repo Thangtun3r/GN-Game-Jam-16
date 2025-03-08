@@ -1,18 +1,31 @@
 using UnityEngine;
+using System.Collections;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class HitEffect : MonoBehaviour
 {
-    private float knockbackSpeed = 10f;      // The fixed speed of the knockback
-    private float knockbackDuration = 0.1f;  // How long the knockback effect lasts
+    [Header("Shake Settings")]
+    [SerializeField] private float shakeDuration = 0.2f;
+    [SerializeField] private float shakeIntensity = 0.1f;
+    [SerializeField] private Transform visualsContainer; // Parent of all visual elements
 
-    private Rigidbody2D rb;
-    private BaseTab baseTab;
+    private Vector3 originalPosition;
+    private bool isShaking = false;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        baseTab = GetComponent<BaseTab>();
+        // If no container is assigned, use this GameObject
+        if (visualsContainer == null)
+        {
+            visualsContainer = transform;
+        }
+        
+        // Store the original position of the container
+        originalPosition = visualsContainer.localPosition;
+        
+        if (visualsContainer == null)
+        {
+            Debug.LogWarning("HitEffect has no visual container to shake on " + gameObject.name);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -20,28 +33,36 @@ public class HitEffect : MonoBehaviour
         // Check if collided with damage dealer
         if (collision.gameObject.GetComponent<CursorDamageDealer>() != null)
         {
-            Debug.Log("Knockback from cursor");
-            if (collision.contacts.Length > 0)
+            Debug.Log("Shake from cursor collision");
+
+            // Start the shake effect
+            if (!isShaking)
             {
-                // Get direction away from the collision point
-                Vector2 contactPoint = collision.contacts[0].point;
-                Vector2 direction = ((Vector2)transform.position - contactPoint).normalized;
-
-                // Cancel any existing velocity first
-                rb.velocity = Vector2.zero;
-                
-                // Apply a fixed velocity regardless of collision force
-                rb.velocity = direction * knockbackSpeed;
-                
-                // Ensure no other forces are affecting the object during knockback
-                rb.angularVelocity = 0f;
-
-                // Tell BaseTab to pause normal movement for the duration
-                if (baseTab != null)
-                {
-                    baseTab.StartKnockback(knockbackDuration);
-                }
+                StartCoroutine(ShakeEffect());
             }
         }
+    }
+
+    private IEnumerator ShakeEffect()
+    {
+        isShaking = true;
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            // Apply random offset to the entire container
+            float x = Random.Range(-1f, 1f) * shakeIntensity;
+            float y = Random.Range(-1f, 1f) * shakeIntensity;
+            
+            visualsContainer.localPosition = originalPosition + new Vector3(x, y, 0);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Return container to original position
+        visualsContainer.localPosition = originalPosition;
+        
+        isShaking = false;
     }
 }

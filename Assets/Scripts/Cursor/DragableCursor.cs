@@ -5,19 +5,18 @@ public class DragableCursor : MonoBehaviour
     [Header("Draggable Settings")]
     [SerializeField] private string draggableTag = "Tab";
     [SerializeField] private float throwForceMultiplier = 10f;
-    [SerializeField] private float throwSpeed = 1f; // Adjustable throw speed factor
+    [SerializeField] private float throwSpeed = 1f;
     [SerializeField] private LayerMask dragMask;
 
     [Header("Throw Force Limits")]
-    [SerializeField] private float minThrowForce = 1f;  // Minimum impulse force to apply
-    [SerializeField] private float maxThrowForce = 20f; // Maximum impulse force to apply
+    [SerializeField] private float minThrowForce = 1f;
+    [SerializeField] private float maxThrowForce = 20f;
 
+    private IDragable selectedDragable = null;
     private Rigidbody2D selectedRb = null;
-    private BaseTab baseTab = null;
     private Vector2 dragOffset = Vector2.zero;
     private Vector2 lastMouseWorldPos;
     private Camera mainCamera;
-    private float originalGravityScale;
 
     private void Awake()
     {
@@ -33,12 +32,12 @@ public class DragableCursor : MonoBehaviour
             TryGrabObject(mouseWorldPos);
         }
 
-        if (Input.GetMouseButton(0) && selectedRb != null)
+        if (Input.GetMouseButton(0) && selectedDragable != null)
         {
             DragObject(mouseWorldPos);
         }
 
-        if (Input.GetMouseButtonUp(0) && selectedRb != null)
+        if (Input.GetMouseButtonUp(0) && selectedDragable != null)
         {
             ReleaseObject(mouseWorldPos);
         }
@@ -50,26 +49,18 @@ public class DragableCursor : MonoBehaviour
 
         if (hit.collider != null && hit.collider.CompareTag(draggableTag))
         {
-            selectedRb = hit.collider.GetComponent<Rigidbody2D>();
+            selectedDragable = hit.collider.GetComponent<IDragable>();
 
-            if (selectedRb != null)
+            if (selectedDragable != null)
             {
-                // Store the original gravity scale and disable gravity during drag
-                originalGravityScale = selectedRb.gravityScale;
-                selectedRb.gravityScale = 0f;
-                selectedRb.velocity = Vector2.zero;
-                selectedRb.angularVelocity = 0f;
-
+                selectedRb = selectedDragable.GetRigidbody();
+                
                 // Calculate offset from mouse to object center
-                dragOffset = (Vector2)selectedRb.transform.position - mouseWorldPos;
+                dragOffset = (Vector2)selectedDragable.GetTransform().position - mouseWorldPos;
                 lastMouseWorldPos = mouseWorldPos;
-
-                // Disable BaseTab movement while dragging
-                baseTab = hit.collider.GetComponent<BaseTab>();
-                if (baseTab != null)
-                {
-                    baseTab.enabled = false;
-                }
+                
+                // Notify the dragable object that it's being dragged
+                selectedDragable.OnStartDrag();
             }
         }
     }
@@ -78,14 +69,12 @@ public class DragableCursor : MonoBehaviour
     {
         // Update object position
         selectedRb.MovePosition(mouseWorldPos + dragOffset);
+        selectedDragable.OnDrag(mouseWorldPos + dragOffset);
         lastMouseWorldPos = mouseWorldPos;
     }
 
     private void ReleaseObject(Vector2 mouseWorldPos)
     {
-        // Restore the original gravity scale before throwing
-        selectedRb.gravityScale = originalGravityScale;
-
         // Calculate the impulse based on direct velocity
         Vector2 throwVelocity = (mouseWorldPos - lastMouseWorldPos) / Time.deltaTime;
         Vector2 impulse = throwVelocity * throwForceMultiplier * throwSpeed;
@@ -99,16 +88,12 @@ public class DragableCursor : MonoBehaviour
 
         // Apply the clamped impulse force
         selectedRb.AddForce(impulse, ForceMode2D.Impulse);
-
-        // Re-enable BaseTab and trigger knockback to disable movement temporarily
-        if (baseTab != null)
-        {
-            baseTab.enabled = true;
-            baseTab.StartKnockback(0.5f); // Disables BaseTab movement for 0.5 seconds
-        }
+        
+        // Notify the dragable that dragging has ended
+        selectedDragable.OnEndDrag(impulse);
 
         // Clear references
+        selectedDragable = null;
         selectedRb = null;
-        baseTab = null;
     }
 }
