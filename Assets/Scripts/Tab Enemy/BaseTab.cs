@@ -12,7 +12,7 @@ public abstract class BaseTab : MonoBehaviour, IDragable
     public float speed = 5f; // Movement speed
 
     [Header("Drag Visuals")]
-    [SerializeField] private GameObject visualContainer; // Assign this in the Inspector
+    [SerializeField] protected GameObject visualContainer; // Made protected so derived classes can access it
     [SerializeField] private float wiggleAmount = 5f; // Degrees of rotation for wiggle
     [SerializeField] private float wiggleSpeed = 10f; // Speed of the wiggle effect
     [SerializeField] private float scaleMultiplier = 1.1f; // Scale increase when dragging
@@ -58,6 +58,7 @@ public abstract class BaseTab : MonoBehaviour, IDragable
 
     protected virtual void FixedUpdate()
     {
+        // Movement only occurs if a target is assigned and no collision pause is active.
         if (isKnockedBack)
         {
             knockbackTimer -= Time.fixedDeltaTime;
@@ -93,15 +94,13 @@ public abstract class BaseTab : MonoBehaviour, IDragable
     {
         if (target == null) return;
 
-        // Stop moving when close to the target
         float distanceToTarget = Vector2.Distance(rb.position, target.position);
         if (distanceToTarget <= stoppingDistance)
         {
-            rb.velocity = Vector2.zero; // Stop moving when close to the target
+            rb.velocity = Vector2.zero;
             return;
         }
 
-        // Otherwise, continue moving
         Vector2 direction = ((Vector2)target.position - rb.position).normalized;
         rb.velocity = direction * speed;
     }
@@ -120,7 +119,17 @@ public abstract class BaseTab : MonoBehaviour, IDragable
         rb.gravityScale = 0f;
         rb.velocity = Vector2.zero;
         rb.angularVelocity = 0f;
-        this.enabled = false;
+
+        // If the object is an explosive tab, let it handle pausing; otherwise disable this component.
+        ExplosiveTab explosive = GetComponent<ExplosiveTab>();
+        if (explosive != null)
+        {
+            explosive.PauseTimer();
+        }
+        else
+        {
+            this.enabled = false;
+        }
 
         if (attachedObjectCollider != null)
         {
@@ -146,7 +155,17 @@ public abstract class BaseTab : MonoBehaviour, IDragable
     public void OnEndDrag(Vector2 velocity)
     {
         rb.gravityScale = originalGravityScale;
-        this.enabled = true;
+
+        ExplosiveTab explosive = GetComponent<ExplosiveTab>();
+        if (explosive != null)
+        {
+            explosive.ResumeTimer();
+        }
+        else
+        {
+            this.enabled = true;
+        }
+
         StartKnockback(0.5f);
 
         if (attachedObjectCollider != null)
@@ -180,22 +199,21 @@ public abstract class BaseTab : MonoBehaviour, IDragable
         return transform;
     }
 
-    // Detects collision and pauses movement if the object is hitting the **facing direction**
+    // Collision handling to pause movement.
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (target == null) return;
 
-        // Don't pause if already close to the target
         float distanceToTarget = Vector2.Distance(rb.position, target.position);
         if (distanceToTarget <= stoppingDistance) return;
 
         Vector2 moveDirection = ((Vector2)target.position - rb.position).normalized;
         foreach (ContactPoint2D contact in collision.contacts)
         {
-            Vector2 normal = contact.normal; // Collision normal (the side that was hit)
+            Vector2 normal = contact.normal;
             float dotProduct = Vector2.Dot(normal, moveDirection);
 
-            if (dotProduct < -0.5f) // Only pause if hitting the side **facing** movement direction
+            if (dotProduct < -0.5f)
             {
                 isPausedByCollision = true;
                 rb.velocity = Vector2.zero;
@@ -204,13 +222,12 @@ public abstract class BaseTab : MonoBehaviour, IDragable
         }
     }
 
-    // Resumes movement when no longer colliding
     private void OnCollisionExit2D(Collision2D collision)
     {
         isPausedByCollision = false;
     }
 
-    // Coroutine for Wiggle Animation
+    // Coroutine for Wiggle Animation (used during dragging).
     private IEnumerator WiggleEffect()
     {
         float timeElapsed = 0f;
@@ -223,7 +240,7 @@ public abstract class BaseTab : MonoBehaviour, IDragable
         }
     }
 
-    // Coroutine for Smooth Scaling
+    // Coroutine for Smooth Scaling.
     private IEnumerator ScaleEffect(Transform target, Vector3 targetScale)
     {
         float elapsedTime = 0f;

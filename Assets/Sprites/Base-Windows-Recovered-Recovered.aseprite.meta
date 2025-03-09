@@ -123,15 +123,15 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Base-Windows-Recovered-Recovered
     originalName: 
-    pivot: {x: 0.49375, y: -0.041666664}
+    pivot: {x: 0.48170733, y: -0.020408163}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 80
-      height: 96
+      width: 82
+      height: 98
     spriteID: dd53ed3afa02b29499db46dc5ab66a5e
     spriteBone: []
     spriteOutline: []
@@ -155,9 +155,9 @@ ScriptedImporter:
       additiveSortOrder: 0
       cellRect:
         x: 5
-        y: 4
-        width: 80
-        height: 96
+        y: 2
+        width: 82
+        height: 98
       spriteId: dd53ed3afa02b29499db46dc5ab66a5e
     linkedCells: []
     parentIndex: -1

@@ -1,13 +1,13 @@
 using UnityEngine;
 using System;
 
-public class EnemyHealth : MonoBehaviour, IDamageable
+public abstract class EnemyHealth : MonoBehaviour, IDamageable
 {
     public int maxHealth = 100;
     private int currentHealth;
     private TabDeathParticle deathParticle;
 
-    // Static event to notify when an enemy dies.
+    // Make this a normal event, but add a public static method to raise it.
     public static event Action OnEnemyDeath;
 
     private void OnEnable()
@@ -36,21 +36,29 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         }
     }
 
-    private void Die()
+    protected virtual void Die()
     {
-        Vector3 deathPosition = transform.position;
-        if (deathParticle != null)
+        // If we have a valid singleton instance, spawn the particle
+        if (TabDeathParticlePool.Instance != null)
         {
-            deathParticle.SpawnDeathParticle();
+            TabDeathParticlePool.Instance.GetParticleEffect(transform.position);
         }
-        
-        // Notify subscribers that this enemy has died.
+
+        // Trigger the OnEnemyDeath event
         OnEnemyDeath?.Invoke();
 
+        // Return this object to its pool (if needed)
         TabPool pool = FindObjectOfType<TabPool>();
         if (pool != null)
         {
             pool.ReturnToPool(gameObject);
         }
+    }
+
+
+    // ➊ Add a static method that raises the event
+    public static void RaiseOnEnemyDeath()
+    {
+        OnEnemyDeath?.Invoke();
     }
 }

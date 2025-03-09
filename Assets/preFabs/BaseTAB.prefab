@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 13099221862983832}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.029, y: 0.034, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -118,10 +118,10 @@ GameObject:
   - component: {fileID: 1624992533722552317}
   - component: {fileID: 8709739426242714265}
   - component: {fileID: 6092024527238501204}
-  - component: {fileID: 6085539562026178680}
   - component: {fileID: 4102310706605584288}
   - component: {fileID: 4390790457147329685}
   - component: {fileID: 287035090062656468}
+  - component: {fileID: 6828750011478442327}
   m_Layer: 7
   m_Name: BaseTAB
   m_TagString: Tab
@@ -185,8 +185,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 2b46c0479f7bd0347b4cf91bc882f0c9, type: 3}
+  m_SortingOrder: 4
+  m_Sprite: {fileID: 21300000, guid: 7db322207d96cf04a83115c78028819e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -233,7 +233,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.6181818, y: 1.9272727}
+    oldSize: {x: 1.4909091, y: 1.7818182}
     newSize: {x: 0.99, y: 1.15}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -263,19 +263,6 @@ MonoBehaviour:
   scaleMultiplier: 1.1
   scaleSpeed: 0.05
   isThrowing: 0
---- !u!114 &6085539562026178680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1189358839157418727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5ef8d18aa091746b5028acaf627f46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 300
 --- !u!50 &4102310706605584288
 Rigidbody2D:
   serializedVersion: 4
@@ -318,6 +305,8 @@ MonoBehaviour:
   shakeDuration: 0.2
   shakeIntensity: 0.1
   visualsContainer: {fileID: 2043293530340656031}
+  hitSprite: {fileID: 21300000, guid: 7db322207d96cf04a83115c78028819e, type: 3}
+  spriteSwapDuration: 0.2
 --- !u!114 &287035090062656468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,3 +334,16 @@ MonoBehaviour:
   slowMotionTimeScale: 0.1
   objectToToggle: {fileID: 0}
   damageAmount: 11111111
+--- !u!114 &6828750011478442327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1189358839157418727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5da0cd8f706541c489400e3ad89a84d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 300

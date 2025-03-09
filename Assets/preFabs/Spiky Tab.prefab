@@ -169,7 +169,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 4
   m_TargetDisplay: 0
 --- !u!114 &3324130353137341690
 MonoBehaviour:
@@ -285,8 +285,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -442,10 +442,10 @@ GameObject:
   - component: {fileID: 1465117492535438337}
   - component: {fileID: 5302906543671850075}
   - component: {fileID: 8208717089022389163}
-  - component: {fileID: 2022986334777863663}
   - component: {fileID: 4999539021887734708}
   - component: {fileID: 8430706767496835142}
   - component: {fileID: 7563946946202957860}
+  - component: {fileID: 8296003144681068574}
   m_Layer: 7
   m_Name: Spiky Tab
   m_TagString: Tab
@@ -509,8 +509,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 2b46c0479f7bd0347b4cf91bc882f0c9, type: 3}
+  m_SortingOrder: 7
+  m_Sprite: {fileID: 21300000, guid: 7db322207d96cf04a83115c78028819e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -557,7 +557,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.6181818, y: 1.9272727}
+    oldSize: {x: 1.4909091, y: 1.7818182}
     newSize: {x: 0.99, y: 1.15}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -614,19 +614,6 @@ MonoBehaviour:
   scaleMultiplier: 1.1
   scaleSpeed: 0.05
   isThrowing: 0
---- !u!114 &2022986334777863663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8227271507635160023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5ef8d18aa091746b5028acaf627f46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 300
 --- !u!114 &4999539021887734708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,6 +629,8 @@ MonoBehaviour:
   shakeDuration: 0.2
   shakeIntensity: 0.1
   visualsContainer: {fileID: 156884933588812989}
+  hitSprite: {fileID: 21300000, guid: 7db322207d96cf04a83115c78028819e, type: 3}
+  spriteSwapDuration: 0.2
 --- !u!114 &8430706767496835142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -682,6 +671,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageDealerTag: Cursor
+--- !u!114 &8296003144681068574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8227271507635160023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5da0cd8f706541c489400e3ad89a84d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 300
 --- !u!1 &8404680823587376877
 GameObject:
   m_ObjectHideFlags: 0
