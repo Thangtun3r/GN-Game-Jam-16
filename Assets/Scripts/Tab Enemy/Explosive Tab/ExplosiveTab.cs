@@ -1,8 +1,19 @@
 using UnityEngine;
 using System.Collections;
+using FMODUnity;
+using FMOD.Studio;
 
 public class ExplosiveTab : BaseTab
 {
+    [Header("Audio")]
+    [SerializeField] private string soundEventPath = "event:/ExplosiveTab";
+    [Tooltip("Volume of the sound effect (0-1)")]
+    [Range(0, 1)]
+    [SerializeField] private float volume = 1f;
+
+    private bool isFirstEnable = true; // Flag to track first enable
+    private EventInstance soundEventInstance;
+
     [Header("Explosive Settings")]
     [Tooltip("Delay (in seconds) before self-destruction occurs")]
     public float selfDestructDelay = 5f;
@@ -19,10 +30,10 @@ public class ExplosiveTab : BaseTab
     [Header("Flashing Effect Settings")]
     [Tooltip("Flash frequency in Hertz (flashes per second)")]
     public float flashFrequency = 2f;
-    
+
     [Tooltip("Minimum opacity for the caution sprite during flashing")]
     public float minOpacity = 0.3f;
-    
+
     [Tooltip("Maximum opacity for the caution sprite during flashing")]
     public float maxOpacity = 1f;
 
@@ -42,9 +53,23 @@ public class ExplosiveTab : BaseTab
     // Cache original positions and components.
     private Vector3 originalVisualPosition;
     private SpriteRenderer cautionSpriteRenderer;
-    
+
     private void OnEnable()
     {
+        // Skip triggering sound on first enable (during pool initialization)
+        if (isFirstEnable)
+        {
+            isFirstEnable = false;
+        }
+        else
+        {
+            // Create and play the sound event (instead of one-shot)
+            soundEventInstance = RuntimeManager.CreateInstance(soundEventPath);
+            soundEventInstance.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            soundEventInstance.setVolume(volume);
+            soundEventInstance.start();
+        }
+
         // Prevent movement by setting speed to 0.
         speed = 0;
 
@@ -67,6 +92,13 @@ public class ExplosiveTab : BaseTab
 
     private void OnDisable()
     {
+        // Stop any playing sound immediately and release the instance
+        if (soundEventInstance.isValid())
+        {
+            soundEventInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            soundEventInstance.release();
+        }
+
         if (_selfDestructCoroutine != null)
         {
             StopCoroutine(_selfDestructCoroutine);
@@ -149,7 +181,7 @@ public class ExplosiveTab : BaseTab
     /// </summary>
     public void Die(bool awardScore)
     {
-        if (_hasExploded) return;  
+        if (_hasExploded) return;
 
         if (_selfDestructCoroutine != null)
         {

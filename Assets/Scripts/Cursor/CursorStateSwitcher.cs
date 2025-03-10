@@ -18,13 +18,17 @@ public class CursorStateSwitcher : MonoBehaviour
 
     [Header("Transition Settings")]
     [SerializeField] private float fadeTransitionDuration = 0.3f;
+    [SerializeField] private float inputBufferDelay = 0.5f; // Buffer delay to prevent accidental toggle
 
     [Header("Cooldown Settings")]
     [SerializeField] private float dragModeDuration = 5f; // How long dragable mode lasts
     [SerializeField] private float dragModeCooldown = 10f; // Cooldown after using dragable mode
     [SerializeField] private TextMeshProUGUI cooldownText; // Text display
     [SerializeField] private Image cooldownRadial;         // Circular fill image
- 
+
+    [Header("Cursor Mode Indicator")]
+    [SerializeField] private SpriteRenderer indicatorSpriteRenderer; // <--- Extra sprite for showing mode
+
     // References to specific components
     private SpriteRenderer colliderCursorSprite;
     private Collider2D colliderCursorCollider;
@@ -36,6 +40,8 @@ public class CursorStateSwitcher : MonoBehaviour
     private float remainingDragDuration;
     private float remainingCooldown;
     private bool isInCooldown = false;
+    private bool isInInputBuffer = false; // New flag for input buffer
+    private float remainingInputBuffer = 0f; // Timer for input buffer
 
     private void Start()
     {
@@ -61,10 +67,21 @@ public class CursorStateSwitcher : MonoBehaviour
 
     private void Update()
     {
+        // Hide default system cursor
         Cursor.visible = false;
 
-        // Toggle cursor state on Tab key press if not in cooldown
-        if (Input.GetKeyDown(KeyCode.Tab) && !isInCooldown)
+        // Update input buffer timer
+        if (isInInputBuffer)
+        {
+            remainingInputBuffer -= Time.deltaTime;
+            if (remainingInputBuffer <= 0f)
+            {
+                isInInputBuffer = false;
+            }
+        }
+
+        // Toggle cursor state on Tab key press if not in cooldown and not in input buffer
+        if (Input.GetKeyDown(KeyCode.Tab) && !isInCooldown && !isInInputBuffer)
         {
             ToggleCursorState();
         }
@@ -92,9 +109,7 @@ public class CursorStateSwitcher : MonoBehaviour
             {
                 // Force release any dragged object before leaving drag mode
                 if (dragableCursor != null)
-                {
                     dragableCursor.ForceReleaseIfDragging();
-                }
 
                 // Switch to collider mode
                 isColliderMode = true;
@@ -150,20 +165,20 @@ public class CursorStateSwitcher : MonoBehaviour
 
             // Initialize the radial to empty (0%) when entering dragable mode
             if (cooldownRadial != null)
-            {
                 cooldownRadial.fillAmount = 0f;
-            }
 
             SetCursorState(false);
+            
+            // Add input buffer when switching to dragable mode
+            isInInputBuffer = true;
+            remainingInputBuffer = inputBufferDelay;
         }
         // Switching back to collider mode
         else if (!isColliderMode)
         {
             // Force release any dragged object before leaving drag mode
             if (dragableCursor != null)
-            {
                 dragableCursor.ForceReleaseIfDragging();
-            }
 
             isColliderMode = true;
             SetCursorState(true);
@@ -174,84 +189,86 @@ public class CursorStateSwitcher : MonoBehaviour
 
             // Set the initial cooldown fill amount to full
             if (cooldownRadial != null)
-            {
                 cooldownRadial.fillAmount = 1f;
-            }
         }
     }
 
     private void SetCursorState(bool useCollider)
     {
-        if (colliderCursor != null)
+        // Fade the in-world cursor sprite
+        if (colliderCursor != null && colliderCursorSprite != null)
         {
-            // Start fade transition between sprites
-            if (colliderCursorSprite != null)
-            {
-                // Stop any ongoing fade
-                if (fadeCoroutine != null)
-                    StopCoroutine(fadeCoroutine);
+            // Stop any ongoing fade
+            if (fadeCoroutine != null)
+                StopCoroutine(fadeCoroutine);
 
-                // Start new fade transition
-                fadeCoroutine = StartCoroutine(FadeBetweenSprites(
-                    useCollider ? colliderModeSprite : dragModeSprite));
-            }
+            // Start new fade transition
+            fadeCoroutine = StartCoroutine(
+                FadeBetweenSprites(useCollider ? colliderModeSprite : dragModeSprite)
+            );
 
-            // Enable/disable the collider based on mode
+            // Enable/disable the collider
             if (colliderCursorCollider != null)
                 colliderCursorCollider.enabled = useCollider;
         }
 
+        // Enable/disable the dragable cursor component
         if (dragableCursor != null)
-        {
             dragableCursor.enabled = !useCollider;
-        }
 
         // Play appropriate particle effect
         if (useCollider)
         {
-            if (colliderModeParticles != null)
-                colliderModeParticles.Play();
+            if (colliderModeParticles != null) colliderModeParticles.Play();
         }
         else
         {
-            if (dragModeParticles != null)
-                dragModeParticles.Play();
+            if (dragModeParticles != null) dragModeParticles.Play();
+        }
+
+        // Update the indicator's sprite
+        if (indicatorSpriteRenderer != null)
+        {
+            indicatorSpriteRenderer.sprite = useCollider
+                ? colliderModeSprite
+                : dragModeSprite;
         }
     }
 
     private IEnumerator FadeBetweenSprites(Sprite targetSprite)
     {
-        // First fade out the current sprite
+        // Fade out current sprite
         Color startColor = colliderCursorSprite.color;
         float elapsedTime = 0f;
 
-        // Fade out
         while (elapsedTime < fadeTransitionDuration / 2)
         {
             elapsedTime += Time.deltaTime;
             float normalizedTime = elapsedTime / (fadeTransitionDuration / 2);
+
             Color newColor = startColor;
             newColor.a = Mathf.Lerp(1f, 0f, normalizedTime);
             colliderCursorSprite.color = newColor;
             yield return null;
         }
 
-        // Change sprite when fully transparent
+        // Switch sprite after fully transparent
         colliderCursorSprite.sprite = targetSprite;
 
-        // Fade in the new sprite
+        // Fade in new sprite
         elapsedTime = 0f;
         while (elapsedTime < fadeTransitionDuration / 2)
         {
             elapsedTime += Time.deltaTime;
             float normalizedTime = elapsedTime / (fadeTransitionDuration / 2);
+
             Color newColor = startColor;
             newColor.a = Mathf.Lerp(0f, 1f, normalizedTime);
             colliderCursorSprite.color = newColor;
             yield return null;
         }
 
-        // Ensure we end with full opacity
+        // Ensure final opacity is 1
         Color finalColor = startColor;
         finalColor.a = 1f;
         colliderCursorSprite.color = finalColor;
@@ -259,20 +276,18 @@ public class CursorStateSwitcher : MonoBehaviour
         fadeCoroutine = null;
     }
 
-    // Optional external methods to enable specific mode from other scripts:
+    // Optionally, call these from other scripts to force a particular mode:
     public void EnableColliderMode()
     {
-        if (!isInCooldown || !isColliderMode)
+        if ((!isInCooldown || !isColliderMode) && !isInInputBuffer)
         {
-            // Force release
             if (dragableCursor != null)
-            {
                 dragableCursor.ForceReleaseIfDragging();
-            }
 
             isColliderMode = true;
             SetCursorState(true);
 
+            // If switching away from drag mode, trigger cooldown
             if (!isColliderMode)
             {
                 isInCooldown = true;
@@ -285,17 +300,19 @@ public class CursorStateSwitcher : MonoBehaviour
 
     public void EnableDragMode()
     {
-        if (!isInCooldown)
+        if (!isInCooldown && !isInInputBuffer)
         {
             isColliderMode = false;
             remainingDragDuration = dragModeDuration;
 
             if (cooldownRadial != null)
-            {
                 cooldownRadial.fillAmount = 0f;
-            }
 
             SetCursorState(false);
+            
+            // Add input buffer when switching to dragable mode
+            isInInputBuffer = true;
+            remainingInputBuffer = inputBufferDelay;
         }
     }
 }

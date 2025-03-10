@@ -201,12 +201,6 @@ MonoBehaviour:
   impactLayer:
     serializedVersion: 2
     m_Bits: 128
-  mainCamera: {fileID: 0}
-  shakeDuration: 0.2
-  shakeIntensity: 0.1
-  slowMotionDuration: 0.6
-  slowMotionTimeScale: 0.1
-  objectToToggle: {fileID: 0}
   damageAmount: 11111111
 --- !u!114 &7744900919304771149
 MonoBehaviour:
@@ -229,8 +223,10 @@ MonoBehaviour:
   scaleMultiplier: 1.1
   scaleSpeed: 0.05
   isThrowing: 0
-  selfDestructDelay: 1
-  cautionThreshold: 0.9
+  soundEventPath: event:/Explosion Staging
+  volume: 1
+  selfDestructDelay: 2.5
+  cautionThreshold: 0.7
   minShakeIntensity: 0.01
   maxShakeIntensity: 0.1
   flashFrequency: 2
@@ -250,7 +246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 300
-  dieDelay: 1
+  dieDelay: 2
   spawnExplosion: 1
   explosiveRangeCaution: {fileID: 5732199971376922204}
   flashFrequency: 2
@@ -392,8 +388,8 @@ Transform:
   m_GameObject: {fileID: 5732199971376922204}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.028402, y: -0.055701, z: 0}
-  m_LocalScale: {x: 0.12226048, y: 0.12226048, z: 0.12226048}
+  m_LocalPosition: {x: -0.0044, y: 0.0485, z: 0}
+  m_LocalScale: {x: 0.1573963, y: 0.15764652, z: 0.15637983}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6312592173953095781}
@@ -523,7 +519,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a0ee9c6d50ebbe94f8546077c05835f9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b133332c67e41704b973fbb5c027baa9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

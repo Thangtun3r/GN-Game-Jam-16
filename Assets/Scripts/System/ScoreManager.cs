@@ -1,48 +1,60 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using FMODUnity;
+using FMOD.Studio;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
-    
-    // Gameplay values.
+
+    [Header("Audio")]
+    [SerializeField] private string scoreIncreaseSoundPath = "event:/ScoreIncrease";
+    [SerializeField] private string multiplierIncreaseSoundPath = "event:/MultiplierIncrease";
+    [Range(0, 1)]
+    [SerializeField] private float volume = 1f;
+
+    private EventInstance scoreIncreaseInstance;
+    private EventInstance multiplierIncreaseInstance;
+
+    // Gameplay values
     public int score = 0;
-    public float displayedScore = 0f; // This is what appears on the screen (smooth transition)
-    public float scoreAnimationSpeed = 5f; // Adjust to control how fast the numbers catch up
+    public float displayedScore = 0f;
+    public float scoreAnimationSpeed = 5f;
 
     public float multiplier = 1f;
     public float multiplierProgress = 0f;
-    public float progressToNextMultiplier = 100f;
+
+    [Header("Multiplier Settings")]
+    public float initialProgressToNextMultiplier = 100f;
+    public float multiplierThresholdGrowthFactor = 1.2f;
+    private float progressToNextMultiplier = 0f;
+
     public int baseScore = 100;
-    
-    // Timer for kill interval.
     private float killIntervalTimer = 0f;
     public float killIntervalThreshold = 3f;
-    
+
     public bool immediateResetOnDamage = true;
 
-    // UI references.
     [Header("UI References")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI multiplierText;
 
-    // Pop, Shake & Scaling Settings
     [Header("Multiplier Scaling, Pop & Shake")]
-    public float baseTextScale = 1.0f; 
-    public float maxTextScale = 2.5f;  
-    public float popScaleMultiplier = 1.2f;  
-    public float popSpeed = 0.15f;    
+    public float baseTextScale = 1.0f;
+    public float maxTextScale = 2.5f;
+    public float popScaleMultiplier = 1.2f;
+    public float popSpeed = 0.15f;
 
-    public float baseShakeMagnitude = 0.1f;  
-    public float maxShakeMagnitude = 5f;    
-    public float shakeFrequency = 0.05f;    
+    public float baseShakeMagnitude = 0.1f;
+    public float maxShakeMagnitude = 5f;
+    public float shakeFrequency = 0.05f;
 
     // Color shifting settings
-    private float currentHue = 0f;  
+    private float currentHue = 0f;
     public float hueShiftStep = 0.15f;
     public float saturation = 1f;
-    public float value = 1f; 
+    public float value = 1f;
 
     private Coroutine shakeCoroutine;
 
@@ -52,27 +64,39 @@ public class ScoreManager : MonoBehaviour
             Destroy(gameObject);
         else
             Instance = this;
+        
+        // Initialize progress to next multiplier from the inspector value.
+        progressToNextMultiplier = initialProgressToNextMultiplier;
     }
-    
+
     private void OnEnable()
     {
         EnemyHealth.OnEnemyDeath += HandleEnemyDeath;
         CursorBeingDamage.OnDamageTaken += HandleCursorDamage;
-
         shakeCoroutine = StartCoroutine(ContinuousShakeEffect());
     }
-    
+
     private void OnDisable()
     {
         EnemyHealth.OnEnemyDeath -= HandleEnemyDeath;
         CursorBeingDamage.OnDamageTaken -= HandleCursorDamage;
-
         if (shakeCoroutine != null) StopCoroutine(shakeCoroutine);
+        StopAndReleaseSound(ref scoreIncreaseInstance);
+        StopAndReleaseSound(ref multiplierIncreaseInstance);
     }
-    
+
+    private void StopAndReleaseSound(ref EventInstance instance)
+    {
+        if (instance.isValid())
+        {
+            instance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            instance.release();
+        }
+    }
+
     private void Update()
     {
-        // Smoothly animate displayed score towards actual score
+        // Smoothly animate displayed score towards the actual score.
         displayedScore = Mathf.Lerp(displayedScore, score, scoreAnimationSpeed * Time.deltaTime);
         UpdateUI();
 
@@ -93,22 +117,40 @@ public class ScoreManager : MonoBehaviour
 
     private void HandleEnemyDeath()
     {
+        // Increase score based on current multiplier.
         score += Mathf.RoundToInt(baseScore * multiplier);
+        PlaySound(ref scoreIncreaseInstance, scoreIncreaseSoundPath);
         killIntervalTimer = 0f;
         multiplierProgress += baseScore;
-        
+
         if (multiplierProgress >= progressToNextMultiplier)
         {
             multiplier += 0.5f;
             multiplierProgress = 0f;
-            progressToNextMultiplier *= 1.2f;
-
+            progressToNextMultiplier *= multiplierThresholdGrowthFactor;
+            PlaySound(ref multiplierIncreaseInstance, multiplierIncreaseSoundPath);
             UpdateTextScale();
             ShiftMultiplierColor();
             StartCoroutine(AnimateMultiplierPop());
         }
     }
-    
+
+    private void PlaySound(ref EventInstance instance, string eventPath)
+    {
+        StopAndReleaseSound(ref instance);
+        try
+        {
+            instance = RuntimeManager.CreateInstance(eventPath);
+            instance.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            instance.setVolume(volume);
+            instance.start();
+        }
+        catch (EventNotFoundException)
+        {
+            Debug.LogWarning($"FMOD event not found: {eventPath}");
+        }
+    }
+
     private void HandleCursorDamage()
     {
         if (immediateResetOnDamage)
@@ -121,22 +163,23 @@ public class ScoreManager : MonoBehaviour
             multiplierProgress = 0f;
         }
     }
-    
+
     private void ResetMultiplier()
     {
         multiplier = 1f;
         multiplierProgress = 0f;
-        progressToNextMultiplier = 100f;
+        progressToNextMultiplier = initialProgressToNextMultiplier;
         killIntervalTimer = 0f;
-        multiplierText.color = Color.white;
+        if (multiplierText != null)
+            multiplierText.color = Color.white;
     }
-    
+
     private void UpdateUI()
     {
         if (scoreText != null)
         {
             int roundedScore = Mathf.RoundToInt(displayedScore);
-            scoreText.text = roundedScore.ToString(); // Smoothly increasing number
+            scoreText.text = roundedScore.ToString();
         }
 
         if (multiplierText != null)
@@ -164,17 +207,13 @@ public class ScoreManager : MonoBehaviour
     {
         Transform txtTransform = multiplierText.transform;
         Vector3 originalPosition = txtTransform.localPosition;
-
         while (true)
         {
             float dynamicShakeMagnitude = Mathf.Lerp(baseShakeMagnitude, maxShakeMagnitude, (multiplier - 1f) / 10f);
-            dynamicShakeMagnitude = Mathf.Max(0f, dynamicShakeMagnitude); 
-
+            dynamicShakeMagnitude = Mathf.Max(0f, dynamicShakeMagnitude);
             Vector3 shakeOffset = Random.insideUnitSphere * dynamicShakeMagnitude;
             shakeOffset.z = 0f;
-
             txtTransform.localPosition = originalPosition + shakeOffset;
-            
             yield return new WaitForSeconds(shakeFrequency);
         }
     }
@@ -186,7 +225,6 @@ public class ScoreManager : MonoBehaviour
         Transform txtTransform = multiplierText.transform;
         Vector3 originalScale = txtTransform.localScale;
         Vector3 targetScale = originalScale * popScaleMultiplier;
-
         float elapsed = 0f;
 
         while (elapsed < popSpeed)
@@ -195,7 +233,6 @@ public class ScoreManager : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-
         txtTransform.localScale = targetScale;
 
         elapsed = 0f;
@@ -205,16 +242,37 @@ public class ScoreManager : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-
         txtTransform.localScale = originalScale;
     }
 
     private void ShiftMultiplierColor()
     {
-        currentHue += hueShiftStep; 
+        currentHue += hueShiftStep;
         if (currentHue > 1f) currentHue -= 1f;
-
         Color newColor = Color.HSVToRGB(currentHue, saturation, value);
-        multiplierText.color = newColor;
+        if (multiplierText != null)
+            multiplierText.color = newColor;
+    }
+
+    // Reset method to clear score and multiplier data.
+    public void ResetScore()
+    {
+        score = 0;
+        displayedScore = 0f;
+        multiplier = 1f;
+        multiplierProgress = 0f;
+        progressToNextMultiplier = initialProgressToNextMultiplier;
+        killIntervalTimer = 0f;
+        
+        if (multiplierText != null)
+        {
+            multiplierText.color = Color.white;
+            multiplierText.text = "";
+        }
+        
+        if (scoreText != null)
+        {
+            scoreText.text = "0";
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class MouseFollower : MonoBehaviour
@@ -10,6 +11,11 @@ public class MouseFollower : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Prevents fast movement from clipping
         rb.interpolation = RigidbodyInterpolation2D.Interpolate; // Smooth movement
+    }
+
+    private void Update()
+    {
+        Cursor.visible = false;
     }
 
     private void FixedUpdate()

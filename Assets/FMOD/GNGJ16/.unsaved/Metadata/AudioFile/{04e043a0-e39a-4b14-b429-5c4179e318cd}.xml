@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{04e043a0-e39a-4b14-b429-5c4179e318cd}">
+		<property name="assetPath">
+			<value>utomp3.com - Confetti Sounds Effects  FREE No Copyright.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>17.972244897959182</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{7951cc14-bab1-4889-b55d-4bbe62358c2f}</destination>
+		</relationship>
+	</object>
+</objects>

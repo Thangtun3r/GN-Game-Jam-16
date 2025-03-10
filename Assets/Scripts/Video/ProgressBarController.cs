@@ -1,8 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class ProgressBarController : MonoBehaviour
 {
+    // Event that triggers when progress bar is completely filled
+    public static event Action OnProgressBarFilled;
+
     [Tooltip("Tag of the objects that will trigger the progress bar fill.")]
     public string targetTag = "Target";
 
@@ -27,6 +31,8 @@ public class ProgressBarController : MonoBehaviour
 
     // Flag indicating whether a valid object is detected
     private bool isObjectDetected = false;
+    // Flag to track if we've already triggered the filled event
+    private bool hasTriggeredFilledEvent = false;
 
     // Store the original local position of the shake object
     private Vector3 defaultPosition;
@@ -37,6 +43,9 @@ public class ProgressBarController : MonoBehaviour
         {
             defaultPosition = shakeObject.transform.localPosition;
         }
+        
+        // Reset the event flag
+        hasTriggeredFilledEvent = false;
     }
 
     // Called while an object remains within the trigger collider
@@ -63,10 +72,23 @@ public class ProgressBarController : MonoBehaviour
         if (isObjectDetected)
         {
             progressBar.fillAmount = Mathf.Clamp01(progressBar.fillAmount + fillRate * Time.deltaTime);
+            
+            // Check if the progress bar is completely filled
+            if (progressBar.fillAmount >= 1f && !hasTriggeredFilledEvent)
+            {
+                hasTriggeredFilledEvent = true;
+                OnProgressBarFilled?.Invoke();
+            }
         }
         else
         {
             progressBar.fillAmount = Mathf.Clamp01(progressBar.fillAmount - cooldownRate * Time.deltaTime);
+            
+            // Reset the event flag when the bar is no longer full
+            if (progressBar.fillAmount < 1f)
+            {
+                hasTriggeredFilledEvent = false;
+            }
         }
 
         // Shake effect: only applied if shakeObject is assigned

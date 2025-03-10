@@ -4,28 +4,27 @@ using UnityEngine;
 [System.Serializable]
 public class PoolEntry
 {
-    public GameObject prefab;  // Drag and drop your prefab here.
-    public int poolSize = 10;  // How many instances to pre-instantiate.
-    public int weight = 1;     // Spawning chance weight (like a gacha system).
+    public GameObject prefab;  // Drag & drop your prefab here
+    public int poolSize = 10;  // How many instances to pre-instantiate
+    public int weight = 1;     // Spawning chance weight (like a gacha system)
 }
 
 public class TabPool : MonoBehaviour
 {
-    // List of prefabs to pool, with size and weight settings.
     public List<PoolEntry> poolEntries;
 
-    // A dictionary to store a queue of inactive objects for each prefab.
+    // A dictionary to store a queue of inactive objects for each prefab
     private Dictionary<GameObject, Queue<GameObject>> poolDictionary = new Dictionary<GameObject, Queue<GameObject>>();
-    
-    // Internal mapping from an instantiated object back to its source prefab.
+
+    // Mapping from instantiated objects back to their source prefab
     private Dictionary<GameObject, GameObject> instanceToPrefab = new Dictionary<GameObject, GameObject>();
-    
-    // List used for weighted selection.
+
+    // List used for weighted selection
     private List<PoolEntry> weightedPoolList = new List<PoolEntry>();
 
     private void Awake()
     {
-        // For each prefab entry, pre-instantiate the set number of objects.
+        // Pre-instantiate objects for each prefab entry
         foreach (PoolEntry entry in poolEntries)
         {
             Queue<GameObject> objectQueue = new Queue<GameObject>();
@@ -42,21 +41,22 @@ public class TabPool : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns an object from the pool based on the weighted chance.
+    /// Returns an object from the pool based on weighted chance.
     /// </summary>
     public GameObject GetObjectFromPool()
     {
-        // Calculate the total weight.
+        // Calculate total weight
         int totalWeight = 0;
         foreach (PoolEntry entry in weightedPoolList)
         {
             totalWeight += entry.weight;
         }
 
-        // Randomly select a weight value.
+        // Randomly select a weight value
         int randomWeight = Random.Range(1, totalWeight + 1);
         int cumulativeWeight = 0;
         PoolEntry selectedEntry = null;
+
         foreach (PoolEntry entry in weightedPoolList)
         {
             cumulativeWeight += entry.weight;
@@ -78,7 +78,7 @@ public class TabPool : MonoBehaviour
             }
             else
             {
-                // If the pool for this prefab is empty, instantiate a new instance.
+                // Pool is empty for this prefab, so instantiate a new one
                 obj = Instantiate(selectedEntry.prefab, transform);
                 instanceToPrefab[obj] = selectedEntry.prefab;
             }

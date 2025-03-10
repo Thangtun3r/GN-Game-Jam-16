@@ -8,12 +8,12 @@ public class ImpactFrameToggle : MonoBehaviour
 
     private void OnEnable()
     {
-        ImpactDebugger.OnToggleObject += ToggleChildObject;
+        EffectManager.OnToggleObject += ToggleChildObject;
     }
 
     private void OnDisable()
     {
-        ImpactDebugger.OnToggleObject -= ToggleChildObject;
+        EffectManager.OnToggleObject -= ToggleChildObject;
     }
 
     private void ToggleChildObject(bool isActive)

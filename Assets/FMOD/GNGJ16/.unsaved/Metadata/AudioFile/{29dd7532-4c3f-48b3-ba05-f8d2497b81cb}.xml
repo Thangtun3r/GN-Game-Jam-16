@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{29dd7532-4c3f-48b3-ba05-f8d2497b81cb}">
+		<property name="assetPath">
+			<value>541828__iainmccurdy__smash-light-bulb.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>192</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.9671302083333333</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{7951cc14-bab1-4889-b55d-4bbe62358c2f}</destination>
+		</relationship>
+	</object>
+</objects>

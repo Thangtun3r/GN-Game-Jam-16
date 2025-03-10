@@ -1,14 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FMODUnity; // Add FMOD Unity namespace
 
 public class CursorHit : MonoBehaviour
 {
+    [Header("Particle Effects")]
     [SerializeField] private ParticleSystem hitParticleEffect;
     [SerializeField] private float particleLifetime = 1f;
-    [SerializeField] private int poolSize = 20; // Number of particle systems to pool
-    [SerializeField] private float minCollisionForce = 3f; // Minimum force required to spawn particles
-    
+    [SerializeField] private int poolSize = 20;
+    [SerializeField] private float minCollisionForce = 3f;
+
+    [Header("Sound Effects")]
+    [SerializeField] private EventReference hitSound; // FMOD event reference
+
     private List<ParticleSystem> particlePool = new List<ParticleSystem>();
     private int currentIndex = 0;
 
@@ -65,28 +70,36 @@ public class CursorHit : MonoBehaviour
             PlayHitEffect(contactPoint, rotation);
         }
     }
-    
+
     private void PlayHitEffect(Vector2 position, Quaternion rotation)
     {
-        if (particlePool.Count == 0) return;
+        // Play visual effect
+        if (particlePool.Count > 0)
+        {
+            // Get next particle from pool
+            ParticleSystem particleSystem = particlePool[currentIndex];
 
-        // Get next particle from pool
-        ParticleSystem particleSystem = particlePool[currentIndex];
+            // Position and activate the particle
+            particleSystem.transform.position = position;
+            particleSystem.transform.rotation = rotation;
+            particleSystem.gameObject.SetActive(true);
 
-        // Position and activate the particle
-        particleSystem.transform.position = position;
-        particleSystem.transform.rotation = rotation;
-        particleSystem.gameObject.SetActive(true);
+            // Make sure any previous emissions are stopped
+            particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            particleSystem.Play(true);
 
-        // Make sure any previous emissions are stopped
-        particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        particleSystem.Play(true);
+            // Schedule to return to pool
+            StartCoroutine(ReturnToPool(particleSystem));
 
-        // Schedule to return to pool
-        StartCoroutine(ReturnToPool(particleSystem));
+            // Update pool index
+            currentIndex = (currentIndex + 1) % poolSize;
+        }
 
-        // Update pool index
-        currentIndex = (currentIndex + 1) % poolSize;
+        // Play sound effect at hit position
+        if (!hitSound.IsNull)
+        {
+            RuntimeManager.PlayOneShot(hitSound, position);
+        }
     }
 
     private IEnumerator ReturnToPool(ParticleSystem particleSystem)
