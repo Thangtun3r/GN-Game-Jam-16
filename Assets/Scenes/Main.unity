@@ -11357,7 +11357,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -3
   m_Sprite: {fileID: 21300000, guid: 0b02cfc0f19dcd5408014b306fa35c42, type: 3}
   m_Color: {r: 0.22352943, g: 0.06666667, b: 0.06666667, a: 1}
   m_FlipX: 0
@@ -11601,9 +11601,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.3665149
+    y: 0.17256841
     width: 1
-    height: 0.26697022
+    height: 0.6548632
   near clip plane: 0.1
   far clip plane: 5000
   field of view: 40

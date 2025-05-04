@@ -6,14 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="637df468-2fa4-4b85-a13d-8e5eff226a45" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GN-Game-Jam-16/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GN-Game-Jam-16/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Cursor/CursorStateSwitcher.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Cursor/CursorStateSwitcher.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Cursor/DragableCursor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Cursor/DragableCursor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Tab Enemy/BaseTab.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Tab Enemy/BaseTab.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Sprites/VideoTab.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Sprites/VideoTab.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Video Stuff/PolishCow.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Video Stuff/PolishCow.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/preFabs/BaseTAB.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/preFabs/BaseTAB.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/preFabs/Spiky Tab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/preFabs/Spiky Tab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/Cache/Editor/FMODStudioCache.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/Cache/Editor/FMODStudioCache.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/Resources/FMODStudioSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/Resources/FMODStudioSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/linux/lib/x86_64/libfmodstudioL.so.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/linux/lib/x86_64/libfmodstudioL.so.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/mac/lib/fmodstudioL.bundle.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/mac/lib/fmodstudioL.bundle.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/win/lib/x86/fmodstudioL.dll.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/win/lib/x86/fmodstudioL.dll.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/win/lib/x86_64/fmodstudioL.dll.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Plugins/FMOD/platforms/win/lib/x86_64/fmodstudioL.dll.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/DOTweenSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/DOTweenSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmod_editor.log" beforeDir="false" afterPath="$PROJECT_DIR$/fmod_editor.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +52,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/VideoAudioToFMOD.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/VideoController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/VideoLoaderTutorial.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.2d.sprite@1.0.0/Editor/Obsolete/ObsoleteSupport.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -61,20 +62,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;&lt;unknown&gt;&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/../../Unity/Builds/GNGJ16\Games Now! 16.exe" />
@@ -147,6 +148,7 @@
       <workItem from="1741522860225" duration="17988000" />
       <workItem from="1741569285606" duration="3012000" />
       <workItem from="1741575547459" duration="2290000" />
+      <workItem from="1746351517420" duration="1101000" />
     </task>
     <servers />
   </component>
